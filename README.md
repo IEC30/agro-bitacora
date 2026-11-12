@@ -27,7 +27,7 @@ En el trabajo agronómico diario, las labores de inspección de cultivos (monito
 
 | Entorno | Enlace / URL | Estado |
 | :--- | :--- | :--- |
-| **Producción (PWA)** | [https://tu-proyecto.netlify.app/](https://agro-bitacora.example.com/) ](https://agrobitacorapwa.netlify.app)| 🟢 Listo para Despliegue SSL |
+| **Producción (PWA)** | [(https://6af61d46ec330b41ca22e083--agrobitacorapwa.netlify.app/)]| 🟢 Desplegado SSL |
 | **Repositorio Git** | [(https://github.com/tu-usuario/agro-bitacora)](https://github.com/IEC30/agro-bitacora.git) | 📦 Historial de Commits Activo |
 
 ---
