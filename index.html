@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#2E7D32">
+  <meta name="description" content="AgroBitácora: Cuaderno de campo y monitoreo fitosanitario offline para agrónomos y técnicos de terreno.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AgroBitácora">
+  <title>AgroBitácora | Cuaderno de Campo Agrícola</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+  <!-- Barra superior de estado de conexión -->
+  <div id="connection-banner" class="status-banner online">
+    <span class="status-indicator"></span>
+    <span id="status-text">Conectado a la Red</span>
+  </div>
+
+  <!-- Cabecera principal -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1>🌾 AgroBitácora</h1>
+      <button id="btn-install" class="btn-install" hidden>📲 Instalar App</button>
+    </div>
+  </header>
+
+  <!-- Barra de Sesión de Usuario Activo -->
+  <div id="user-session-bar" class="user-session-bar" style="display:none;">
+    <div class="user-info">
+      <span class="user-avatar">👤</span>
+      <div>
+        <span id="session-user-name" class="session-user-name">Ing. Carlos Mendoza</span>
+        <span id="session-user-role" class="role-badge badge-supervisor">Supervisor</span>
+      </div>
+    </div>
+    <button id="btn-logout" class="btn-logout" title="Cerrar Sesión">Cerrar Sesión ➔</button>
+  </div>
+
+  <main class="main-container">
+
+    <!-- SECCIÓN DE AUTENTICACIÓN (LOGIN OFFLINE) -->
+    <section id="auth-section" class="card auth-card">
+      <h2>🔐 Acceso al Cuaderno de Campo</h2>
+      <p class="auth-desc">Inicie sesión con su perfil de técnico, supervisor o auditor fitosanitario para operar en terreno sin conexión.</p>
+      
+      <form id="form-login" class="form-login">
+        <div class="form-group">
+          <label for="login-email">Usuario / Correo Electrónico:</label>
+          <input type="email" id="login-email" required placeholder="ejemplo@agrobitacora.local">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña:</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        
+        <div id="login-error" class="login-error" style="display:none;"></div>
+        
+        <button type="submit" class="btn-primary">Ingresar al Sistema</button>
+      </form>
+
+      <!-- Panel de Accesos Rápidos para Rúbrica / Evaluación -->
+      <div class="demo-profiles-box">
+        <h3>⚡ Accesos Rápidos de Evaluación (Perfiles de Prueba)</h3>
+        <p class="subtext">Presione un botón para rellenar credenciales e ingresar de inmediato con ese rol:</p>
+        
+        <div class="demo-buttons-grid">
+          <button type="button" class="btn-demo btn-demo-sup" data-email="supervisor@agrobitacora.local" data-pass="CampoSeguro2026!">
+            <div class="demo-role-title">🌾 Agrónomo Supervisor</div>
+            <div class="demo-role-desc">Acceso total, edición, auditoría y eliminación</div>
+            <code class="demo-code">supervisor@agrobitacora.local</code>
+          </button>
+
+          <button type="button" class="btn-demo btn-demo-tec" data-email="tecnico.campo@agrobitacora.local" data-pass="SiembraOffline#1">
+            <div class="demo-role-title">🚜 Técnico de Terreno</div>
+            <div class="demo-role-desc">Registro diario, GPS satelital y fotos de cámara</div>
+            <code class="demo-code">tecnico.campo@agrobitacora.local</code>
+          </button>
+
+          <button type="button" class="btn-demo btn-demo-aud" data-email="auditor.sag@agrobitacora.local" data-pass="ControlPlagas2026">
+            <div class="demo-role-title">🔍 Auditor Fitosanitario</div>
+            <div class="demo-role-desc">Solo lectura y exportación de trazabilidad</div>
+            <code class="demo-code">auditor.sag@agrobitacora.local</code>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENEDOR PRINCIPAL DE LA APLICACIÓN (CUADERNO DE CAMPO) -->
+    <div id="app-workspace" style="display:none;">
+      
+      <!-- Formulario de Registro de Observación -->
+      <section id="form-card" class="card form-card">
+        <h2>📝 Nueva Observación de Campo</h2>
+
+        <!-- Banner especial para rol Auditor (Solo Lectura) -->
+        <div id="auditor-notice" class="auditor-notice" style="display:none;">
+          <span class="auditor-icon">🛡️</span>
+          <div>
+            <strong>Modo Auditoría Activo (SAG / Fitosanitario)</strong>
+            <p>Su perfil dispone de permisos exclusivos de <em>solo lectura y exportación</em>. El registro y la modificación de observaciones están restringidos para garantizar la integridad de las evidencias.</p>
+          </div>
+        </div>
+
+        <form id="form-observation">
+          <div class="form-group">
+            <label for="lote">Parcela / Sector / Lote:</label>
+            <input type="text" id="lote" required placeholder="Ej. Cuadro 3 - Sector Las Palmas">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cultivo">Cultivo / Variedad:</label>
+              <input type="text" id="cultivo" required placeholder="Ej. Palto Hass">
+            </div>
+            <div class="form-group">
+              <label for="categoria">Labor / Evento:</label>
+              <select id="categoria" required>
+                <option value="Monitoreo">Monitoreo General</option>
+                <option value="Plagas">Plaga o Enfermedad</option>
+                <option value="Riego">Riego</option>
+                <option value="Fertilizacion">Fertilización</option>
+                <option value="Fenologia">Etapa Fenológica</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notas">Notas de campo / Diagnóstico:</label>
+            <textarea id="notas" rows="3" required placeholder="Describa incidencia, dosis aplicada, nivel de infestación o humedad..."></textarea>
+          </div>
+
+          <!-- Módulo GPS (Geolocation API) -->
+          <fieldset class="module-box">
+            <legend>📍 Geoposicionamiento de la Parcela</legend>
+            <div class="geo-controls">
+              <div>
+                <button type="button" id="btn-get-geo" class="btn-secondary">
+                  <span>🛰️</span> Capturar Coordenadas GPS
+                </button>
+              </div>
+              <div id="geo-status" class="geo-status-box">Coordenadas no fijadas</div>
+            </div>
+            <input type="hidden" id="geo-lat">
+            <input type="hidden" id="geo-lng">
+            <input type="hidden" id="geo-acc">
+          </fieldset>
+
+          <!-- Módulo Cámara (MediaDevices API / Input Fallback) -->
+          <fieldset class="module-box">
+            <legend>📷 Registro Fitosanitario (Fotografía)</legend>
+            <div class="camera-controls">
+              <button type="button" id="btn-open-camera" class="btn-secondary">
+                <span>📷</span> Activar Cámara
+              </button>
+              
+              <!-- Selector nativo como fallback para compatibilidad universal -->
+              <input type="file" id="camera-fallback" accept="image/*" capture="environment" style="display:none;">
+              <button type="button" id="btn-fallback-camera" class="btn-subtle">
+                Abrir app de cámara del móvil
+              </button>
+            </div>
+
+            <!-- Visor en vivo con getUserMedia -->
+            <div id="camera-stream-container" class="camera-stream-container" style="display:none;">
+              <video id="camera-video" playsinline autoplay muted></video>
+              <button type="button" id="btn-snap-photo" class="btn-capture">⚪ Tomar Foto</button>
+            </div>
+
+            <!-- Previsualización de la captura -->
+            <div id="photo-preview-container" class="preview-container" style="display:none;">
+              <img id="photo-preview" alt="Evidencia fitosanitaria">
+              <button type="button" id="btn-delete-photo" class="btn-delete-photo" title="Descartar foto">✕</button>
+            </div>
+          </fieldset>
+
+          <button type="submit" id="btn-submit" class="btn-primary">
+            💾 Guardar en Bitácora Local
+          </button>
+        </form>
+      </section>
+
+      <!-- Listado de Observaciones Registradas Localmente -->
+      <section class="card list-card">
+        <div class="list-header">
+          <h2>📋 Cuaderno de Campo Local</h2>
+          <div class="list-header-actions">
+            <button id="btn-export-report" class="btn-secondary btn-sm" title="Descargar datos en formato JSON de trazabilidad">
+              📥 Exportar Trazabilidad (JSON)
+            </button>
+            <span id="sync-badge" class="badge">0 registros locales</span>
+          </div>
+        </div>
+        <div id="observations-list" class="observations-list">
+          <p class="empty-msg">No hay registros almacenados en este dispositivo.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Módulos JavaScript -->
+  <script src="js/auth.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/geo.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "AgroBitácora - Cuaderno de Campo",
+  "short_name": "AgroBitácora",
+  "description": "Registro de observaciones fitosanitarias, riego y labores agrícolas en campo sin conexión.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F4F7F4",
+  "theme_color": "#2E7D32",
+  "lang": "es-ES",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
